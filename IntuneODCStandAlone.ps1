@@ -40,7 +40,7 @@ $CompressedResultFileName = "$($env:COMPUTERNAME)_CollectedData_$fileTime.ZIP"
 [System.Nullable[bool]] $newZipperAvailable = $null # Stores flag whether [System.IO.Compression.ZipFile] can be used.
 
 $global:LogName = "$env:systemroot\temp\stdout.log"
-$ODCversion = "2024.10.2" 
+$ODCversion = "2026.1.30" 
 
 #endregion
 
@@ -1809,4 +1809,5 @@ if (Test-Path -Path . -Filter ".*CollectedData.*.zip") {
     Remove-Item -Path .\*.evtx -Force -ErrorAction SilentlyContinue
 }
 Start-Process .
+
 
