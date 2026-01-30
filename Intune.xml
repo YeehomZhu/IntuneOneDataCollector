@@ -426,6 +426,7 @@ if ($WMIOS -ne $null) { #if WMIOS is null - means connection failed. Abort scrip
  
  # https://en.wikipedia.org/wiki/Windows_10_version_history
  $versions = @{
+ "26200" =   "Win11 25H2"
  "26100" =   "Win11 24H2"
  "22631" =   "Win11 23H2"
  "22622" =   "Win11 22H2"
@@ -448,6 +449,7 @@ if ($WMIOS -ne $null) { #if WMIOS is null - means connection failed. Abort scrip
  }
 
  $marketingNames = @{
+ "26200" =   "Win11 2025 Update"
  "26100" =   "Win11 2024 Update"
  "22631" =   "Win11 2023 Update"
  "22622" =   "Win11 2022 Update"
@@ -471,6 +473,7 @@ if ($WMIOS -ne $null) { #if WMIOS is null - means connection failed. Abort scrip
 
 
   $codeNames = @{
+ "26200" =   "Win11 25H2"
  "26100" =   "Win11 24H2"
  "22631" =   "Win11 23H2"
  "22622" =   "Win11 22H2"
@@ -549,7 +552,7 @@ if ($MachineIDContainer){
 $SubscriptionID = $ds -match "SubscriptionID : (.+)"
 
 # Start reporting
-$highestWinBuildNumber = "26100"
+$highestWinBuildNumber = "26200"
 
 $OS_Summary | Format-List
 
@@ -5289,10 +5292,11 @@ $resultBlob | Format-List
 	  <File Team="DeviceInventory">%ProgramFiles%\Microsoft Device Inventory Agent\Logs\*</File>	  
 	  <File Team="DeviceInventory">%ProgramFiles%\Microsoft Device Inventory Agent\InventoryService\*.sqlite</File>
 	  <File Team="EPM">%ProgramFiles%\Microsoft EPM Agent\Logs\*</File>
+      <File Team="WPM">%TEMP%\winget\defaultState\WPM-*.txt</File>
       <File Team="General">%LOCALAPPDATA%\Temp\*.log</File>
 	  <File Team="General">%SystemRoot%\Temp\WinGet\defaultState</File>
 	  <File Team="General">%LOCALAPPDATA%\Temp\WinGet\defaultState</File>
-      <File Team="General">%LocalAppData%\Local\Microsoft\Edge\User Data\MAMLog.txt</File>
+      <File Team="General">%LocalAppData%\Microsoft\Edge\User Data\MAMLog.txt</File>
       <File Team="General">%ProgramData%\Microsoft\IntuneManagementExtension\Logs\*</File>
       <File Team="General">%ProgramData%\microsoft\diagnosticlogcsp\collectors\*</File>
       <File Team="General">%ProgramFiles%\Microsoft Intune\ODJConnector\ODJConnectorUI\*.log</File>
@@ -5356,10 +5360,10 @@ $resultBlob | Format-List
       <Registry Team="..\RegistryKeys" OutputFileName="REG_CCS_Control_Windows_CSDVersion">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Windows\CSDVersion</Registry>
       <Registry Team="..\RegistryKeys" OutputFileName="REG_CCS_Services_CertPropSvc">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\CertPropSvc</Registry>
       <Registry Team="..\RegistryKeys" OutputFileName="REG_CCS_Services_Crypt32">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\crypt32</Registry>
-      <Registry Team="..\RegistryKeys" OutputFileName="REG_CCS_Services_CryptSvc">HKEY_LOCAL_MACHINE\SYSTEM\SYSTEM\CurrentControlSet\services\CryptSvc</Registry>
+      <Registry Team="..\RegistryKeys" OutputFileName="REG_CCS_Services_CryptSvc">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\CryptSvc</Registry>
       <Registry Team="..\RegistryKeys" OutputFileName="REG_CCS_Services_HTTP">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\HTTP</Registry>
       <Registry Team="..\RegistryKeys" OutputFileName="REG_CCS_Services_SCPolicySvc">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\SCPolicySvc</Registry>
-      <Registry Team="..\RegistryKeys" OutputFileName="REG_CCS_Services_SCardSvr">HKEY_LOCAL_MACHINE\HKLM\SYSTEM\CurrentControlSet\services\SCardSvr</Registry>
+      <Registry Team="..\RegistryKeys" OutputFileName="REG_CCS_Services_SCardSvr">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\SCardSvr</Registry>
       <Registry Team="..\RegistryKeys" OutputFileName="REG_CCS_Services_SharedAccess_FirewallRules">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\SharedAccess\Parameters\FirewallPolicy\Mdm</Registry>
       <Registry Team="..\RegistryKeys" OutputFileName="REG_CCS_Services_SharedAccess_Parameters_FirewallPolicy">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SharedAccess</Registry>
       <Registry Team="..\RegistryKeys" OutputFileName="REG_CCS_Services_TPM">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\TPM</Registry>
