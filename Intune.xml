@@ -87,7 +87,7 @@ function WaitOnSchTask {
 
 try {     
     $Action= New-ScheduledTaskAction -Execute "cmd.exe" -Argument "/c dsregcmd /debug &gt;&gt; $filepath"
-    $nil = Register-ScheduledTask -TaskName $taskName -Trigger $Trigger -User $User -Action $Action -RunLevel Highest –Force
+    $nil = Register-ScheduledTask -TaskName $taskName -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Force
     $nil = Start-ScheduledTask -TaskName $taskName
     
      # wait for task to complete
@@ -262,7 +262,7 @@ $WMIOS = get-wmiobject -class "win32_operatingsystem"  -ErrorAction SilentlyCont
 if ($Error.Count -ne 0) {
  $errorMessage = $Error[0].Exception.Message
  $errorCode = "0x{0:X}" -f $Error[0].Exception.ErrorCode
- "Error" +  $errorCode + ": $errorMessage connecting to $MachineName" | WriteTo-StdOut
+ "Error" +  $errorCode + ": $errorMessage connecting to $MachineName" | Write-Output
  $Error.Clear()
 }
 
@@ -504,7 +504,7 @@ if ($WMIOS -ne $null) { #if WMIOS is null - means connection failed. Abort scrip
   $CustomerID = (Get-ItemProperty -Path $SCAKey).CustomerID
   if ($CustomerID -ne $null)
   {
-   "System Center Advisor detected. Customer ID: $CustomerID" | writeto-stdout
+   "System Center Advisor detected. Customer ID: $CustomerID" | Write-Output
    $SCA_Summary = New-Object PSObject
    $SCA_Summary | add-member -membertype noteproperty -name "Customer ID" -value $CustomerID
    $SCA_Summary | ConvertTo-Xml2 | update-diagreport -id ("01_SCACustomerSummary") -name "System Center Advisor" -verbosity Informational
@@ -665,7 +665,6 @@ RunCommand "gwmi Win32_DiskPartition"
 RunCommand "gwmi -class win32_logicaldisk"
 RunCommand "gwmi -class win32_volume"</Command>
       <Command Type="PS" Team="General" OutputFileName="Firewall_Settings">RunCommand "netsh advfirewall show allprofiles"
-RunCommand "netsh advfirewall show allprofiles"
 RunCommand  "netsh advfirewall show global"
 RunCommand  "Get-NetFirewallProfile"
 RunCommand  "Get-NetFirewallRule"
@@ -696,6 +695,7 @@ if  ($mpcExists -and ($DefenderServiceIsRunning -eq "Running" )) {
 }
 else {
 	$deflog = join-path $outputPath "DefenderErrors.txt"
+	$DefenderStartupType = (Get-Service sense -ErrorAction SilentlyContinue).StartType
     "Warning:  Defender Service (sense) is not running.  Startup type is $DefenderStartupType. This is expected if 3rd party AV is installed.  Skipping Defender data collection." |  Out-File $deflog -Force
 	"Defender service (sense) status is $DefenderServiceIsRunning" | Out-File $deflog -Append -Force
     "Defender service (windefend) status is $WinDefendServiceIsRunning" | Out-File $deflog -Append -Force
@@ -712,6 +712,7 @@ RunCommand -cmdToRun "reg.exe query HKLM\SYSTEM\CurrentControlSet\Services\Tcpip
 RunCommand -cmdToRun "reg.exe query HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters /v EnableRSS" 
 RunCommand -cmdToRun "reg.exe query HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters /v EnableTCPA" 
 RunCommand -cmdToRun "reg.exe query HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters /v DisableTaskOffload" 
+$OSVersion = [System.Environment]::OSVersion.Version
 if ($OSVersion.Major -ge 6)
 {
  RunCommand -cmdToRun "netsh int tcp show global" 
@@ -737,7 +738,6 @@ RunCommand -cmdToRun "net accounts"
 RunCommand -cmdToRun "net statistics workstation"</Command>
       <Command Type="PS" Team="General" OutputFileName="sym_Process.txt">Get-Process | select Name, FileVersion, Path, ProductVersion | ft -auto -wrap</Command>
       <Command Type="PS" Team="General" OutputFileName="sym_drivers.txt">Get-WmiObject Win32_PnPSignedDriver| select DeviceName, DriverVersion | ft -auto -wrap</Command>
-       <Command Type="PS" Team="General" OutputFileName="sym_RunningDrivers.txt">Get-WmiObject Win32_PnPSignedDriver | select DeviceName, DriverVersion | ft -auto</Command>
       <Command Type="CMD" Team="General" OutputFileName="ScheduledTasks">schtasks.exe /fo list /v</Command>
       <Command Type="PS" Team="General" OutputFileName="NA">$outputPath = "$env:temp\CollectedData\Intune\Commands\Windows Update"
 $x = if (-not (Test-Path $outputPath)) { mkdir $outputPath -Force}
@@ -895,8 +895,7 @@ if (Test-Path HKLM:\SOFTWARE\Microsoft\MicrosoftIntune\NDESConnector) {
             "$installFolder\NDESConnectorSvc\Logs\Logs\CertificateRegistrationPoint*",
             "$installFolder\NDESConnectorUI\NDESConnectorUI.log",
             "$installFolder\NDESConnectorUI\Logs\*",
-            "C:\inetpub\logs\LogFiles\W3SVC1\u_ex*.log"
-            "$installFolder\NDESPolicyModule\Logs\NDESPlugin.log",
+            "C:\inetpub\logs\LogFiles\W3SVC1\u_ex*.log",
             "C:\NDESConnectorSetup\*.log",
             "$env:programfiles\Microsoft Configuration Manager\logs\ndes*"
              )
@@ -3657,7 +3656,7 @@ Process
             $userPath = $_.PSPath
             $userSid = $_.PSChildName
             Write-Output " "
-            Write-Output "USER ESP for $($userSid):" Write-Output " "
+            Write-Output "USER ESP for $($userSid):"; Write-Output " "
             if (Test-Path "$userPath\ExpectedPolicies") {
                 [array]$items = Get-ChildItem "$userPath\ExpectedPolicies"
                 AddDisplay ([ref]$items)
@@ -3710,7 +3709,7 @@ Process
                     default { $color = "0" }
                 }
                 $e = [char]27
-                "$em$($_.Status)$e[0m"
+                "$e[$($color)m$($_.Status)$e[0m"
             }
         },
         Detail
@@ -3926,7 +3925,7 @@ Write-PS1File
 # Register task and execute
 try {
     $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File `"$tempFilePath`" -Nologo -OutFile `"$filepath`"" 
-    $null   = Register-ScheduledTask -TaskName $taskName -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Description $desc –Force
+    $null   = Register-ScheduledTask -TaskName $taskName -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Description $desc -Force
     $null   = Start-ScheduledTask -TaskName $taskName
     }
 catch {
@@ -3957,6 +3956,7 @@ catch {
 
 </Command>
       <Command Type="PS" Team="Autopilot" OutputFileName="NA">
+$outputPath = "$env:temp\CollectedData\Intune\Commands\Autopilot"
 $x = if (-not (Test-Path $outputPath)) { mkdir $outputPath -Force}
 
 copy $env:ProgramData\microsoft\diagnosticlogcsp\collectors\*.etl .
@@ -4127,7 +4127,7 @@ function Test-AlwaysAutoRebootEnabled {
 
 
     if (  $rebootEnabledBySchedule -or $rebootEnabledByDuration ) {
-        $result = "PassedWithWarning"
+        $result = "Warning"
         $ResultMessage = "Windows Update reboot registry keys are set. This can cause unexpected reboots when installing updates."
     }
     else {
@@ -4509,7 +4509,7 @@ Function Test-DHMUploadDestination{
          }
          else {
              $result = "Failed"
-             $ResultMessage = "Unexpected or missing vlaue in $DHM_Key_PolicyManager\ConfigDeviceHealthMonitoringUploadDestination - $AllowDHM_Value_PolicyManager. This is required if Expedited Updates or Feature Update policies are configured.
+             $ResultMessage = "Unexpected or missing value in $DHM_Key_PolicyManager\ConfigDeviceHealthMonitoringUploadDestination - $AllowDHM_Value_PolicyManager. This is required if Expedited Updates or Feature Update policies are configured.
              `r`nThis is an unexpected scenario and a Windows Update specialist should be consulted to investigate."
          }
        
@@ -4624,7 +4624,7 @@ Function Test-IsDualScanEnabled {
          $ResultMessage = "No DisableDualScan Registry entries found.  Device will use Windows Update."
 		}
 
-    if ($SetDualScanIsConfigured -and $PolicyDrivenSourceValues.count-ne 4) {
+    if ($SetDualScanIsConfigured -and $PolicyDrivenSourceValues.count -ne 4) {
         $ResultMessage += "`r`n`t`t***Warning: only $($PolicyDrivenSourceValues.Count) policy driven entries found. It is recommended to configure all 4 SetPolicyDrivenUpdateSource* sources. Please see https://learn.microsoft.com/en-us/windows/deployment/update/wufb-wsus."
     }
     	"::::`r`n$PolicyDrivenSourceTable"
@@ -5256,8 +5256,7 @@ $resultBlob | Format-List
       <EventLog Team="..\EventLogs">%SystemRoot%\system32\Winevt\Logs\Microsoft-Windows-DeviceSetupManager*</EventLog>
       <EventLog Team="..\EventLogs">%SystemRoot%\system32\Winevt\Logs\Microsoft-Windows-HelloForBusiness*</EventLog>
       <EventLog Team="..\EventLogs">%SystemRoot%\system32\winevt\logs\Microsoft-Windows-Kernel-Boot%4Operational.evtx</EventLog>
-      <EventLog Team="..\EventLogs">%SystemRoot%\system32\winevt\logs\Microsoft-Windows-LAPS*</EventLog> 
-      <EventLog Team="..\EventLogs">%SystemRoot%\system32\winevt\logs\Microsoft-Windows-Microsoft-Windows-AppLocker*</EventLog>
+      <EventLog Team="..\EventLogs">%SystemRoot%\system32\winevt\logs\Microsoft-Windows-LAPS*</EventLog>
 	  <EventLog Team="..\EventLogs">%SystemRoot%\system32\winevt\logs\Microsoft-Windows-DeviceGuard%4Operational.evtx</EventLog>
       <EventLog Team="..\EventLogs">%SystemRoot%\system32\winevt\logs\Microsoft-Windows-ModernDeployment-*</EventLog>
       <EventLog Team="..\EventLogs">%SystemRoot%\system32\winevt\logs\Microsoft-Windows-NetworkProfile*</EventLog>
@@ -5321,7 +5320,7 @@ $resultBlob | Format-List
       <File Team="MSI Logs">%temp%\*MSI*.log</File>
       <File Team="NDES">%ProgramFiles%\Microsoft Configuration Manager\logs\ndes*</File>
       <File Team="NDES">%ProgramFiles%\Microsoft Intune\NDESConnectorSvc\NDESConnector.exe.config</File>
-      <File Team="NDES">%ProgramFiles%\Microsoft Intune\NDESConnectorSvc\logs\logs\*</File>
+      <File Team="NDES">%ProgramFiles%\Microsoft Intune\NDESConnectorSvc\Logs\*</File>
       <File Team="NDES">%ProgramFiles%\Microsoft Intune\NDESConnectorUI\NDESConnectorUI.log</File>
       <File Team="NDES">%ProgramFiles%\Microsoft Intune\NDESPolicyModule\Logs\NDESPlugin.log</File>
       <File Team="NDES">%temp%\*CertConnectorLogs*.zip</File>
