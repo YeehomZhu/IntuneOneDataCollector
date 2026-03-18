@@ -5291,6 +5291,7 @@ $resultBlob | Format-List
 	  <File Team="DeviceInventory">%ProgramFiles%\Microsoft Device Inventory Agent\Logs\*</File>	  
 	  <File Team="DeviceInventory">%ProgramFiles%\Microsoft Device Inventory Agent\InventoryService\*.sqlite</File>
 	  <File Team="EPM">%ProgramFiles%\Microsoft EPM Agent\Logs\*</File>
+	  <File Team="EPM">%systemroot%\system32\config\systemprofile\AppData\Local\mdm\*.log</File>
       <File Team="WPM">%TEMP%\winget\defaultState\WPM-*.txt</File>
       <File Team="General">%LOCALAPPDATA%\Temp\*.log</File>
 	  <File Team="General">%SystemRoot%\Temp\WinGet\defaultState</File>
