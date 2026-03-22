@@ -2755,10 +2755,28 @@ while ( ($elapsed -lt $timeoutInSec) -and $stillRunning ) {
         $stillRunning = $false
     }
 }</Command>
-      <Command Type="PS" Team="General" OutputFileName="NA">MdmDiagnosticsTool.exe  -out $pwd
-$outputPath = "$env:temp\CollectedData\Intune\Commands\General"
+      <Command Type="PS" Team="General" OutputFileName="NA">$outputPath = "$env:temp\CollectedData\Intune\Commands\General"
 $x = if (-not (Test-Path $outputPath)) { mkdir $outputPath -Force}
-move .\MDMDiagReport.* $outputPath</Command>
+
+# Dynamically read all available MdmDiagnostics areas from the registry
+$areaRegPath = "HKLM:\SOFTWARE\Microsoft\MdmDiagnostics\Area"
+if (Test-Path $areaRegPath) {
+    $areas = (Get-ChildItem $areaRegPath | Select-Object -ExpandProperty PSChildName) -join ";"
+    if ($areas) {
+        Write-Output "Running MdmDiagnosticsTool with areas: $areas"
+        MdmDiagnosticsTool.exe -area "$areas" -zip "$outputPath\MDMDiagReport-AllAreas.zip"
+    }
+    else {
+        Write-Output "No areas found under $areaRegPath, running default collection"
+        MdmDiagnosticsTool.exe -out $pwd
+        move .\MDMDiagReport.* $outputPath
+    }
+}
+else {
+    Write-Output "Registry key $areaRegPath not found, running default collection"
+    MdmDiagnosticsTool.exe -out $pwd
+    move .\MDMDiagReport.* $outputPath
+}</Command>
       <Command Type="PS" Team="General" OutputFileName="Windows_AV_(WATP)_info.txt">RunCommand -cmdToRun "Get-CimInstance -ClassName AntiVirusProduct            -Namespace  ROOT\SecurityCenter2"
 RunCommand -cmdToRun "Get-CimInstance -ClassName AntiSpywareProduct          -Namespace  ROOT\SecurityCenter2"
 RunCommand -cmdToRun "Get-CimInstance -ClassName FirewallProduct             -Namespace  ROOT\SecurityCenter2"
