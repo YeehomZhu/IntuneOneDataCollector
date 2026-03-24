@@ -1,4 +1,4 @@
-﻿<#
+<#
     Stand-alone implementation of One Data Collector
 
 #>
@@ -40,7 +40,7 @@ $CompressedResultFileName = "$($env:COMPUTERNAME)_CollectedData_$fileTime.ZIP"
 [System.Nullable[bool]] $newZipperAvailable = $null # Stores flag whether [System.IO.Compression.ZipFile] can be used.
 
 $global:LogName = "$env:systemroot\temp\stdout.log"
-$ODCversion = "2026.2.15" 
+$ODCversion = "2026.3.23" 
 
 #endregion
 
